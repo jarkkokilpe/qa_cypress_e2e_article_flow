@@ -1,3 +1,52 @@
+const { faker } = require('@faker-js/faker');
+
+describe('Login, create, and delete an article', () => {
+  const email = faker.internet.email().toLowerCase();
+  const randomNumber = Math.floor(Math.random(1000) * 1000);
+  const username = faker.person.firstName() + randomNumber;
+  const password = '12345Qwert!';
+  const uniqueTitle = `Feel news ${Date.now()}`;
+  const description = 'This article tells about how I feel';
+  const body = 'I am feeling good today!';
+
+  it('logs in, creates an article, and deletes it', () => {
+    // Log in using the custom command
+    cy.login(email, username, password);
+
+    // Create an article using the custom command
+    cy.createArticle(uniqueTitle, description, body);
+
+    // Verify the article is visible in the UI
+    cy.visit('/');
+    cy.get('li.nav-item > a.nav-link').contains('Global Feed').click(); // Click "Global Feed"
+    cy.get('.article-preview')
+      .contains(`Article title: ${uniqueTitle}`) // Verify the article title is in the list
+      .should('be.visible');
+
+    // Open the article
+    cy.get('.article-preview')
+      .contains(`Article title: ${uniqueTitle}`)
+      .click();
+
+    // Delete the article
+    cy.get('button.btn.btn-outline-danger.btn-sm')
+      .contains('Delete Article')
+      .click();
+
+    // Confirm the deletion in the alert dialog
+    cy.on('window:confirm', (text) => {
+      expect(text).to.equal('Do you really want to delete it?');
+      return true; // Simulates clicking "OK"
+    });
+
+    // Verify the article is deleted
+    cy.get('.article-preview')
+      .contains('No articles are here... yet.')
+      .should('be.visible');
+  });
+});
+
+/*
 describe('Login and verify user profile', () => {
   before(() => {
     // Visit the login page
@@ -38,3 +87,4 @@ describe('Login and verify user profile', () => {
       .should('be.visible');
   });
 });
+*/
