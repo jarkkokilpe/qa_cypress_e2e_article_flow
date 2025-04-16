@@ -1,9 +1,9 @@
 const { faker } = require('@faker-js/faker');
 
 describe('Login, create, and delete an article', () => {
-  const email = faker.internet.email().toLowerCase();
   const randomNumber = Math.floor(Math.random(1000) * 1000);
   const username = faker.person.firstName() + randomNumber;
+  const email = username + '@example.com';
   const password = '12345Qwert!';
   const uniqueTitle = `Feel news ${Date.now()}`;
   const description = 'This article tells about how I feel';
